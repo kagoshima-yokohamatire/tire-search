@@ -354,12 +354,11 @@ td.price-new-only{font-size:16px;font-weight:700;color:var(--navy);white-space:n
             <th onclick="sortBy(0)" id="th0">アーティクルNo.</th>
             <th onclick="sortBy(7)" id="th7">価格（税抜）</th>
             <th id="th-stock" style="min-width:60px;">在庫</th>
-            <th onclick="sortBy(9)" id="th9">5/31まで</th>
-            <th id="th-diff">価格差</th>
+
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="8"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>
+          <tr><td colspan="6"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -432,7 +431,7 @@ function resetSearch() {
   filtered = [];
   document.getElementById('resultCount').textContent = '検索条件を選択してください';
   document.getElementById('tbody').innerHTML =
-    '<tr><td colspan="8"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>';
+    '<tr><td colspan="6"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>';
   document.getElementById('pag').style.display = 'none';
   clearSort();
 }
@@ -479,7 +478,7 @@ function render() {
 
   const tbody = document.getElementById('tbody');
   if (total === 0) {
-    tbody.innerHTML = '<tr><td colspan="8"><div class="no-results"><div class="ico">🚫</div><p>該当するタイヤが見つかりませんでした</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6"><div class="no-results"><div class="ico">🚫</div><p>該当するタイヤが見つかりませんでした</p></div></td></tr>';
     document.getElementById('pag').style.display = 'none';
     return;
   }
@@ -514,8 +513,7 @@ function render() {
       '<td class="art-cell">' + article + '</td>' +
       '<td class="price-new">' + pnFmt + '</td>' +
       '<td style="text-align:center;">' + (stockOnly ? '<span class="flag-s">在庫限</span>' : '') + (isNew ? '<span class="flag-new">NEW</span>' : '') + '</td>' +
-      '<td class="price-old">' + (poFmt || '') + '</td>' +
-      '<td>' + diffHtml + '</td>' +
+
       '</tr>';
   }).join('');
 
