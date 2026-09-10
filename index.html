@@ -53,6 +53,24 @@ header .sub{font-size:11px;color:#aab7c4;margin-top:3px;}
   padding:3px 8px;border-radius:3px;
   border:1px solid rgba(255,255,255,.12);
 }
+.pdf-btn{
+  display:inline-block;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:5px;
+  padding:5px 12px;
+  font-size:12px;
+  font-family:'BIZ UDPGothic',sans-serif;
+  font-weight:700;
+  text-decoration:none;
+  white-space:nowrap;
+  transition:background .15s,border-color .15s;
+}
+.pdf-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);}
+@media(max-width:600px){
+  .pdf-btn{font-size:11px;padding:4px 9px;}
+}
 
 /* LAYOUT */
 .container{max-width:1400px;margin:0 auto;padding:16px;}
@@ -267,7 +285,7 @@ td.price-new-only{font-size:16px;font-weight:700;color:var(--navy);white-space:n
   .filter-row1{flex-direction:column;}
   /* 2行目：幅・扁平率を横並び2列 */
   .filter-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end;flex-wrap:wrap;}
-  /* 内径とボタンは3行目として折り返す */
+  /* 内径・レス率は3行目として */
   .filter-row2-inner{grid-column:1;}
   .filter-row2-btn{grid-column:2;flex:0 0 auto;}
   .btn-group{width:100%;}
@@ -296,7 +314,11 @@ td.price-new-only{font-size:16px;font-weight:700;color:var(--navy);white-space:n
       <div class="sub">2026年6月版 ／ 全 1,638 アイテム</div>
     </div>
     <div class="header-right">
-      <div class="date-tag">6月1日以降の価格を表示</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <a href="TOYOTA.pdf" target="_blank" class="pdf-btn">📄 トヨタキャンペーン価格</a>
+        <a href="BATTERY.pdf" target="_blank" class="pdf-btn">📄 バッテリー価格</a>
+      </div>
+      <div class="date-tag" style="margin-top:6px;">6月1日以降の価格を表示</div>
     </div>
   </div>
 </header>
@@ -323,6 +345,13 @@ td.price-new-only{font-size:16px;font-weight:700;color:var(--navy);white-space:n
         <div class="fg filter-row2-inner">
           <label>内径</label>
           <select id="innerSel"><option value="">— すべて —</option></select>
+        </div>
+        <div class="fg" style="max-width:110px;">
+          <label>レス率</label>
+          <div style="position:relative;">
+            <input type="number" id="lessRate" min="0" max="99" step="0.1" placeholder="0" style="width:100%;padding:8px 28px 8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'BIZ UDPGothic',sans-serif;background:#f8f9fa;color:var(--text);outline:none;-webkit-appearance:none;appearance:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+            <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none;">%</span>
+          </div>
         </div>
         <div class="fg btn-fg filter-row2-btn">
           <label>&nbsp;</label>
@@ -352,13 +381,14 @@ td.price-new-only{font-size:16px;font-weight:700;color:var(--navy);white-space:n
             <th onclick="sortBy(1)" id="th1">サイズ</th>
             <th id="th-hobby" style="min-width:60px;">ホビー</th>
             <th onclick="sortBy(0)" id="th0">アーティクルNo.</th>
-            <th onclick="sortBy(7)" id="th7">価格（税抜）</th>
+            <th onclick="sortBy(7)" id="th7">A表価格（税抜）</th>
+            <th id="th-shikiri">仕切価格（税抜）</th>
             <th id="th-stock" style="min-width:60px;">在庫</th>
 
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="6"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>
+          <tr><td colspan="7"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -431,7 +461,7 @@ function resetSearch() {
   filtered = [];
   document.getElementById('resultCount').textContent = '検索条件を選択してください';
   document.getElementById('tbody').innerHTML =
-    '<tr><td colspan="6"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>';
+    '<tr><td colspan="7"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>';
   document.getElementById('pag').style.display = 'none';
   clearSort();
 }
@@ -478,7 +508,7 @@ function render() {
 
   const tbody = document.getElementById('tbody');
   if (total === 0) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="no-results"><div class="ico">🚫</div><p>該当するタイヤが見つかりませんでした</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="no-results"><div class="ico">🚫</div><p>該当するタイヤが見つかりませんでした</p></div></td></tr>';
     document.getElementById('pag').style.display = 'none';
     return;
   }
@@ -487,22 +517,15 @@ function render() {
     const [article, size, brand, hobby, width, flat, inner, priceNew, stockOnly, priceOld] = r;
     const isNew = priceOld === 'NEW' || priceOld === 0;
     const pnFmt = fmt(priceNew);
-    const poFmt = isNew ? null : fmt(priceOld);
 
-    let diffHtml = '';
-    if (!isNew && priceOld && priceNew) {
-      const diff = priceNew - priceOld;
-      const pct = ((diff / priceOld) * 100).toFixed(1);
-      if (diff > 0) {
-        diffHtml = '<span class="price-diff diff-up">+' + diff.toLocaleString('ja-JP') + ' (' + pct + '%)</span>';
-      } else if (diff < 0) {
-        diffHtml = '<span class="price-diff diff-down">' + diff.toLocaleString('ja-JP') + ' (' + pct + '%)</span>';
-      } else {
-        diffHtml = '<span class="price-diff diff-same">±0</span>';
-      }
+    // 仕切価格計算
+    const lessRateVal = parseFloat(document.getElementById('lessRate').value);
+    let shikiriHtml = '';
+    if (!isNaN(lessRateVal) && lessRateVal > 0 && priceNew) {
+      const raw = priceNew * (1 - lessRateVal / 100);
+      const rounded = Math.round(raw / 100) * 100;
+      shikiriHtml = '<span style="font-size:15px;font-weight:700;color:#1a6fa8;">¥' + rounded.toLocaleString('ja-JP') + '</span>';
     }
-
-
 
     const rowClass = hobby ? 'hobby-row' + (stockOnly ? ' stock-row' : '') : (stockOnly ? 'stock-row' : '');
 
@@ -512,8 +535,8 @@ function render() {
       '<td style="text-align:center;">' + (hobby ? '<span class="flag-h">ホビー</span>' : '') + '</td>' +
       '<td class="art-cell">' + article + '</td>' +
       '<td class="price-new">' + pnFmt + '</td>' +
+      '<td>' + shikiriHtml + '</td>' +
       '<td style="text-align:center;">' + (stockOnly ? '<span class="flag-s">在庫限</span>' : '') + (isNew ? '<span class="flag-new">NEW</span>' : '') + '</td>' +
-
       '</tr>';
   }).join('');
 
