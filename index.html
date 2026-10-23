@@ -386,13 +386,11 @@ td.price-new-only{font-size:16px;font-weight:700;color:var(--navy);white-space:n
             <th onclick="sortBy(7)" id="th7">A表価格（税抜）</th>
             <th id="th-shikiri">仕切価格（税抜）</th>
             <th id="th-stock" style="min-width:60px;">在庫</th>
-            <th id="th-old" style="min-width:90px;">旧A表価格</th>
-            <th id="th-diff" style="min-width:80px;">価格差</th>
 
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="9"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>
+          <tr><td colspan="7"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -465,7 +463,7 @@ function resetSearch() {
   filtered = [];
   document.getElementById('resultCount').textContent = '検索条件を選択してください';
   document.getElementById('tbody').innerHTML =
-    '<tr><td colspan="9"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>';
+    '<tr><td colspan="7"><div class="no-results"><div class="ico">🔍</div><p>検索条件を選択して「検索」ボタンを押してください</p></div></td></tr>';
   document.getElementById('pag').style.display = 'none';
   clearSort();
 }
@@ -512,7 +510,7 @@ function render() {
 
   const tbody = document.getElementById('tbody');
   if (total === 0) {
-    tbody.innerHTML = '<tr><td colspan="9"><div class="no-results"><div class="ico">🚫</div><p>該当するタイヤが見つかりませんでした</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="no-results"><div class="ico">🚫</div><p>該当するタイヤが見つかりませんでした</p></div></td></tr>';
     document.getElementById('pag').style.display = 'none';
     return;
   }
@@ -533,18 +531,6 @@ function render() {
 
     const rowClass = hobby ? 'hobby-row' + (stockOnly ? ' stock-row' : '') : (stockOnly ? 'stock-row' : '');
 
-    // 旧価格・価格差
-    let oldHtml = '', diffHtml = '';
-    if (priceOld && priceOld !== 'NEW' && priceOld !== 0 && priceNew) {
-      oldHtml = '<span style="color:#555;">¥' + Number(priceOld).toLocaleString('ja-JP') + '</span>';
-      const diff = priceNew - priceOld;
-      if (diff !== 0) {
-        const sign = diff > 0 ? '+' : '';
-        const col  = diff > 0 ? '#c0392b' : '#1a6fa8';
-        diffHtml = '<span style="font-weight:700;color:' + col + ';">' + sign + diff.toLocaleString('ja-JP') + '</span>';
-      }
-    }
-
     return '<tr class="' + rowClass + '">' +
       '<td class="sticky-col">' + brand + '</td>' +
       '<td class="size-cell">' + size + '</td>' +
@@ -553,8 +539,6 @@ function render() {
       '<td class="price-new">' + pnFmt + '</td>' +
       '<td>' + shikiriHtml + '</td>' +
       '<td style="text-align:center;">' + (stockOnly ? '<span class="flag-s">在庫限</span>' : '') + (isNew ? '<span class="flag-new">NEW</span>' : '') + '</td>' +
-      '<td style="text-align:right;">' + oldHtml + '</td>' +
-      '<td style="text-align:right;">' + diffHtml + '</td>' +
       '</tr>';
   }).join('');
 
